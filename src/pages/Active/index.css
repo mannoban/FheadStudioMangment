@@ -1,0 +1,50 @@
+.active_bg {
+    text-align: center;
+}
+
+
+/* 列表 */
+
+.active_container {
+    width: 80%;
+    margin: 10px auto;
+}
+
+.active_list {
+    background-color: #fff;
+    width: 80%;
+    margin: 10px auto;
+    padding: 10px;
+}
+
+.active_items {
+    position: relative;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    margin-left: 15px;
+    border-bottom: 1px solid #CCC;
+    /* background-color: pink; */
+}
+
+.active_describe {
+    position: absolute;
+    left: 160px;
+    top: 50px;
+}
+
+.active_title {
+    position: absolute;
+    left: 160px;
+}
+
+.active_time {
+    position: absolute;
+    bottom: 10px;
+    right: 30px;
+    color: #ccc;
+}
+
+.active_img>img {
+    width: 140px;
+    height: 100px;
+}

@@ -1,0 +1,57 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+#app {
+    min-width: 1500px;
+}
+
+.layout {
+    width: 100%;
+    height: auto;
+    margin: 0 auto;
+    min-width: 1264px;
+    max-width: 1856px;
+}
+
+a {
+    text-decoration: none;
+}
+
+li {
+    list-style: none;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+input,
+textarea {
+    border: 1px solid #ccc;
+    outline: none;
+}
+
+input:focus {
+    border: 1px solid #409eff;
+}
+
+textarea:focus {
+    border: 1px solid #409eff;
+}
+
+input[readonly] {
+    background-color: rgb(245, 245, 245);
+}
+
+input[type="text"] {
+    background-color: #fff !important;
+}
+
+button {
+    border: none;
+    outline: none;
+    background-color: #fff;
+}

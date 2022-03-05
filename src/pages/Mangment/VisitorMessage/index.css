@@ -1,0 +1,66 @@
+.visitor_message {
+    margin-top: 65px;
+    margin-left: 205px;
+    width: 100%;
+    height: 100%;
+}
+
+.block {
+    /* margin-right: 205px; */
+    margin-top: 1%;
+    margin-left: 50%;
+    transform: translateX(-50%);
+}
+
+.edit_visitors_form {
+    position: absolute;
+    z-index: 3;
+    width: 600px;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #fff;
+    border: 2px solid #409eff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 20px;
+}
+
+input[type="radio"] {
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.search {
+    position: relative;
+}
+
+.search_input {
+    border: none;
+    outline: none;
+    border: 1px solid #ccc;
+    width: 250px;
+    height: 30px;
+    border-radius: 5px;
+    margin: 10px 10px 10px 2px;
+    text-indent: 2em;
+}
+
+.search_input:focus {
+    border: 1px solid #409eff;
+}
+
+.search_icon {
+    position: absolute;
+    top: 16px;
+    left: 220px;
+}
+
+.el-pagination.is-background .el-pager li:not(.disabled).active {
+    background-color: #17cedd;
+    color: #fff;
+}

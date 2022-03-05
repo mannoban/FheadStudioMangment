@@ -1,0 +1,83 @@
+/* 布局 */
+
+.mavonEditor {
+    width: 80%;
+    margin-top: 85px;
+    margin-left: 220px;
+}
+
+.article_header {
+    margin-bottom: 20px;
+    display: flex;
+    position: relative;
+}
+
+.markdown {
+    height: 550px;
+    width: 1250px;
+    position: fixed;
+}
+
+
+/* 搜索栏 */
+
+.title_input {
+    width: 1010px;
+    margin-right: 20px;
+    display: inline-block;
+    height: 28px;
+    border: 1px solid #ccc;
+    text-indent: 2em;
+    border-radius: 14px;
+}
+
+.title_input:focus {
+    border: none;
+    outline: none;
+    border: 1px solid #409eff;
+}
+
+.article_title_words {
+    position: absolute;
+    left: 950px;
+    top: 6px;
+    font-size: 13px;
+    color: #555666;
+}
+
+
+/* 上传表单 */
+
+.article_describe_textarea {
+    top: 1px;
+    left: 180px;
+    text-indent: 0.5em;
+    resize: none;
+    padding: 10px;
+    height: 124px;
+    border-radius: 5px;
+}
+
+.article_describe_words {
+    position: absolute;
+    top: 120px;
+    left: 505px;
+}
+
+.punlishBtn {
+    width: 90px;
+    height: 32px;
+    margin: 0 10px 0 10px;
+    background-color: #fa451c;
+    color: #fff;
+    font-size: 14px;
+    border-radius: 16px;
+}
+
+.punlishBtn:hover {
+    background-color: #fc5531;
+}
+
+.radius {
+    border-radius: 15px;
+}
