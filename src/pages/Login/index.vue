@@ -31,9 +31,9 @@
             <input
               id="email"
               type="text"
-              placeholder="请输入邮箱或用户名"
+              placeholder="请输入邮箱或手机号"
               class="user_input"
-              v-model="userForm.email"
+              v-model="userForm.userName"
             />
           </div>
           <div class="password">
@@ -154,6 +154,7 @@ import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 import api from "../../api/index";
 import regExp from "../../utils/regExp";
+import { log } from "console";
 export default defineComponent({
   name: "Login",
   components: {
@@ -168,9 +169,8 @@ export default defineComponent({
       isRegister: false,
       loginFormRember: false,
       userForm: {
-        email: "",
+        userName: "",
         password: "",
-        identifyCode: "",
       },
       registerForm: {
         userName: "",
@@ -181,30 +181,43 @@ export default defineComponent({
       },
     });
 
+    const login = (userForm: object) => {
+      api
+        .userLogin(userForm)
+        .then((res) => {
+          let { token, userId } = res.data.data;
+          store.dispatch("setToken", token);
+          store.dispatch("getUser", userId);
+          router.push("/my");
+          ElMessage({
+            message: "登录成功",
+            type: "success",
+          });
+        })
+        .catch((err) => {
+          throw err;
+        });
+    };
+
     // 登录
     const submitLogin = () => {
-      if (!regExp.emailReg.test(state.userForm.email)) {
+      if (regExp.emailReg.test(state.userForm.userName)) {
+        let userForm = {
+          email: state.userForm.userName,
+          password: state.userForm.password,
+        };
+        login(userForm);
+      } else if (regExp.phoneReg.test(state.userForm.userName)) {
+        let userForm = {
+          telephone: state.userForm.userName,
+          password: state.userForm.password,
+        };
+        login(userForm);
+      } else {
         ElMessage({
-          showClose: true,
-          message: "请输入正确的邮箱格式",
+          message: "请输入正确的邮箱或手机号格式",
           type: "error",
         });
-      } else {
-        api
-          .userLogin(state.userForm)
-          .then((res) => {
-            let token = res.data.token;
-            store.dispatch("setToken", token);
-            router.push("/my");
-            ElMessage({
-              showClose: true,
-              message: "登录成功",
-              type: "success",
-            });
-          })
-          .catch((err) => {
-            throw err;
-          });
       }
     };
 
@@ -213,13 +226,11 @@ export default defineComponent({
       let { email, phone } = state.registerForm;
       if (!regExp.emailReg.test(email)) {
         ElMessage({
-          showClose: true,
           message: "请输入正确的邮箱格式",
           type: "error",
         });
       } else if (!regExp.phoneReg.test(phone)) {
         ElMessage({
-          showClose: true,
           message: "请输入正确的手机号",
           type: "error",
         });

@@ -45,73 +45,84 @@
       <button class="search_srticle_button">搜索</button>
     </header>
     <!-- 文章列表 -->
-    <ul
-      class="article_mangment_list"
-      v-for="(item, index) in articleList"
-      :key="item.id"
-    >
-      <li>
-        <div class="list_item_header">
-          <a class="article_mangment_title" href="#" title="111">{{
-            item.title
-          }}</a>
-          <span style="float: right; font-size: 14px; color: #999">{{
-            formatTime(item.date)
-          }}</span>
+    <ul class="article_mangment_list">
+      <li v-for="(item, index) in articleList" :key="item.articleid">
+        <div class="list_item_cover left_view">
+          <img :src="item.coverImgId" alt="" />
         </div>
-        <div class="list_item_container">
-          <span class="original" v-if="item.labelType == '原创'">原创</span>
-          <span class="draft" v-if="item.labelType == '草稿'">草稿</span>
-        </div>
-        <div class="list_item_footer">
-          <span class="article_list_footer_date"
-            >展现量{{ item.showAmount }}</span
-          >
-          <span class="circle"></span>
-          <span class="article_list_footer_date"
-            >阅读{{ item.readAmount }}</span
-          >
-          <span class="circle"></span>
-          <span class="article_list_footer_date"
-            >评论{{ item.commentAmount }}</span
-          >
-          <span class="circle"></span>
-          <span class="article_list_footer_date"
-            >收藏{{ item.collectAmount }}</span
-          >
-          <div class="article_mangment_footer_right">
-            <span
-              class="article_mangment_footer_edit"
-              v-if="item.labelType == '原创'"
-              >查看数据</span
-            >
-            <span
-              class="article_mangment_footer_edit"
-              @click="editThisArticle(item, index)"
-              >编辑</span
-            >
-            <span class="article_mangment_footer_edit">浏览</span>
-            <span
-              class="article_mangment_footer_edit"
-              v-if="item.labelType == '原创'"
-            >
-              <el-tooltip content="Bottom Left prompts info" effect="light">
-                <template #content>
-                  <button class="reset_btn">置顶</button>
-                  <br />
-                  <button class="reset_btn">删除</button>
-                </template>
-                <span style="position: relative">
-                  <i>
-                    <img
-                      src="../../../static/icons/others.svg"
-                      alt=""
-                      style="position: absolute; top: 2px"
-                    />
-                  </i>
-                </span>
-              </el-tooltip>
-            </span>
+        <div class="right_view">
+          <div class="list_item_header">
+            <a class="article_mangment_title" href="#" title="111">{{
+              item.title
+            }}</a>
+            <span style="float: right; font-size: 14px; color: #999">{{
+              formatTime(item.publishTime)
+            }}</span>
+          </div>
+          <div class="list_item_container">
+            <span class="original" v-if="item.alreadyPublish == 1">原创</span>
+            <span class="draft" v-if="item.alreadyPublish == 0">草稿</span>
+          </div>
+          <div class="list_item_footer">
+            <span class="article_list_footer_date">阅读量</span>
+            <span class="circle"></span
+            ><span class="article_list_footer_date">{{ item.viewNum }}</span>
+            <div class="article_mangment_footer_right">
+              <span
+                class="article_mangment_footer_edit"
+                v-if="item.alreadyPublish == 1"
+                @click="lookArticleDate()"
+                >查看数据</span
+              >
+              <span
+                class="article_mangment_footer_edit"
+                @click="editThisArticle(item, index)"
+                >编辑</span
+              >
+              <span
+                class="article_mangment_footer_edit"
+                @click="lookThisArticle()"
+                >浏览</span
+              >
+              <span class="article_mangment_footer_edit">
+                <el-tooltip content="Bottom Left prompts info" effect="light">
+                  <template #content>
+                    <div v-if="item.alreadyPublish === 0">
+                      <button
+                        class="reset_btn"
+                        @click="deleteThisArticle(item.articleId, index)"
+                      >
+                        删除
+                      </button>
+                    </div>
+                    <div v-if="item.alreadyPublish === 1">
+                      <button
+                        class="reset_btn"
+                        @click="setTopArticle(item.articleId, index)"
+                      >
+                        置顶
+                      </button>
+                      <br />
+                      <button
+                        class="reset_btn"
+                        @click="deleteThisArticle(item.articleId)"
+                      >
+                        删除
+                      </button>
+                    </div>
+                  </template>
+                  <span style="position: relative">
+                    <i>
+                      <img
+                        src="../../../static/icons/others.svg"
+                        alt=""
+                        style="position: absolute; top: 2px"
+                      />
+                    </i>
+                  </span>
+                </el-tooltip>
+              </span>
+            </div>
           </div>
         </div>
       </li>
@@ -122,9 +133,11 @@
 <script lang="ts">
 import { onMounted, reactive, toRefs, provide, inject } from "vue";
 import { formatTime } from "../../../utils/use";
-import axios from "axios";
 import { useRouter } from "vue-router";
-import { MgmtArticleData } from "../../../utils/type";
+import { MgmtArticleData, ColumnArrObj, TopData } from "../../../utils/type";
+import api from "../../../api/index";
+import { ElMessageBox, ElMessage } from "element-plus";
+import useTop from "../../../Hook/useTop";
 export default {
   name: "MgmtArticle",
   components: {},
@@ -216,29 +229,39 @@ export default {
         },
       ],
       articleList: [],
+      oldArticleId: "",
     });
 
     onMounted(() => {
       init();
     });
 
-    const init = async () => {
-      await axios
-        .get("http://127.0.0.1:8080/api/article/all")
-        .then((res) => {
-          let { article, column } = res.data.data;
-          data.articleList = article;
-          data.columnOptions = column;
-          console.log(data.articleList);
-        })
-        .catch((err) => {
-          throw err;
+    // 文章获取
+    const init = () => {
+      api.getAllArticle().then((res) => {
+        let { articleList, columnName } = res.data;
+        // 专栏初始化
+        let columnArr: MgmtArticleData["columnOptions"] = [];
+        columnName.forEach((element: string, index: number) => {
+          let obj: ColumnArrObj = {
+            id: 0,
+            label: "",
+            value: "",
+          };
+          obj.id = index;
+          obj.label = element;
+          obj.value = element;
+          columnArr.push(obj);
         });
+        data.columnOptions = columnArr;
+        data.articleList = useTop(articleList);
+      });
     };
 
-    // 编辑文章(movonEditor回显)
+    // 编辑文章(movonEditor回显) ok
     const router = useRouter();
     const editThisArticle = (item: any, index: number) => {
+      console.log(item);
       router.push({
         path: "/my/publishArticle",
         query: {
@@ -247,21 +270,82 @@ export default {
       });
     };
 
-    // 查看数据
-    // const lookArticleDate = () => {};
+    // 获取原来置顶的文章Id
+    const getOldArticleId = () => {
+      data.articleList.forEach((item) => {
+        item.top === true ? (data.oldArticleId = item.articleId) : "";
+      });
+    };
 
-    // 浏览
-    // const lookThisArticle = () => {};
+    // 置顶文章接口
+    const useTopArticleApi = (topData: TopData) => {
+      api.topArticle(topData).then((res) => {
+        ElMessage({
+          type: "success",
+          message: "置顶成功",
+        });
+      });
+    };
 
-    // 置顶
-    // const setTopArticle = () => {};
+    // 置顶;
+    const setTopArticle = async (articleId: string, index: number) => {
+      await getOldArticleId();
+      let oldArticleId = data.oldArticleId;
+      if (oldArticleId === "") {
+        let topData: TopData = {
+          newArticleId: articleId,
+        };
+        useTopArticleApi(topData);
+        console.log(topData);
+      } else {
+        let topData: TopData = {
+          oldArticleId,
+          newArticleId: articleId,
+        };
+        useTopArticleApi(topData);
+        console.log(topData);
+      }
 
-    // 删除
-    // const deleteThisArticle = () => {};
+      /*  let oldArticle = data.articleList[0];
+      let oldArticleTopNumber: number = oldArticle.top;
+      let top: number = oldArticleTopNumber + 1;
+      let topData: TopData = {
+        articleId,
+        top,
+      };
+      api.topArticle(topData).then((res) => {}); */
+    };
+
+    // 删除;
+    const deleteThisArticle = (articleId: string) => {
+      ElMessageBox.confirm("确认删除该文章吗?", "", {
+        confirmButtonText: "确认",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(() => {
+        api.deleteArticle(articleId).then((res) => {
+          ElMessage({
+            type: "success",
+            message: "删除成功",
+          });
+        });
+      });
+    };
+
+    // 查看数据;
+    const lookArticleDate = () => {};
+
+    // 浏览;
+    const lookThisArticle = () => {};
+
     return {
       ...toRefs(data),
       formatTime,
       editThisArticle,
+      lookArticleDate,
+      lookThisArticle,
+      setTopArticle,
+      deleteThisArticle,
     };
   },
 };
@@ -302,22 +386,54 @@ export default {
   border-radius: 5px;
 }
 .article_mangment_list {
+  margin-top: 20px;
+}
+.list_item_cover {
+  width: 100px;
+  height: 100px;
+  text-align: center;
+}
+.list_item_cover > img {
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.article_mangment_list > li {
   width: 98%;
-  margin-left: 15px;
-  margin-top: 30px;
-  /* background-color: pink; */
+  border-top: 0.1px dashed rgb(228, 227, 227);
+  display: flex;
+  padding: 10px 0 10px 0;
+  height: 120px;
+}
+.article_mangment_list:last-child {
   border-bottom: 0.1px dashed rgb(228, 227, 227);
 }
-.list_item_header {
-  height: 36.8px;
+.left_view {
+  min-width: 120px;
+  width: 120px;
+  height: 120px;
+  position: relative;
 }
-.list_item_container {
-  height: 18px;
+.right_view {
+  flex-grow: 1;
+  margin-left: 15px;
+  display: flex;
+  flex-direction: column;
 }
+.right_view > div {
+  height: 40px;
+
+  line-height: 40px;
+}
+.list_item_header,
+.list_item_container,
 .list_item_footer {
-  height: 45px;
-  line-height: 55px;
+  display: block;
 }
+
 .circle {
   display: inline-block;
   width: 4px;

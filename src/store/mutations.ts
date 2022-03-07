@@ -5,5 +5,8 @@ export default {
     },
     OUT_LOGIN(state: any) {
         state.token = '';
+    },
+    GET_USER(state: any, value: String) {
+        state.userId = value
     }
 }

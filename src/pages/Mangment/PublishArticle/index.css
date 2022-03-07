@@ -81,3 +81,10 @@
 .radius {
     border-radius: 15px;
 }
+
+.uoloadSty .el-upload--picture-card {}
+
+.disUoloadSty .el-upload--picture-card {
+    display: none;
+    /* 上传按钮隐藏 */
+}

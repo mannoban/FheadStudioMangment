@@ -13,20 +13,18 @@ export interface RegisterForm {
 }
 
 export interface ArticleForm {
-    articleId: string | number,
-    userId: string | number,
+    articleId: string,
+    userId: string,
     title: string,
     content: string,
-    imgFile: any,
     abstrct: string,
+    coverImgId: any
+    label: Array<{}>, //文章标签
+    column: Array<{}>,
+    publishMethod: string,
+    alreadyPublish: boolean,
+    date: number,
     coverType: string
-    coverUrl: string,
-    labelType: Array<string>,
-    columnType: Array<string>,
-    releaseType: string,
-    type: string,
-    publishDelayTime: string | number,
-    date: any,
 }
 
 export interface AllColumnListData {
@@ -39,6 +37,7 @@ export interface AllColumnListData {
     }>;
     dragging: any;
 };
+
 
 export interface MgmtArticleData {
     yearValue: string;
@@ -67,5 +66,20 @@ export interface MgmtArticleData {
         readAmount: number;
         commentAmount: number;
         collectAmount: number;
+        top: boolean
     }>;
+    oldArticleId?: string
 }
+
+
+export interface ColumnArrObj {
+    id: number;
+    label: string;
+    value: string;
+}
+
+export interface TopData {
+    oldArticleId?: string,
+    newArticleId: string
+}
+
