@@ -33,18 +33,11 @@ const api = {
     getArticle<T>(articleId: T) {
         return axios.get(base.baseUrl + base.getArticle + articleId)
     },
-
     /* 
     获取所有文章
     */
-    getAllArticle() {
-        return axios.get(base.baseUrl + base.getAllArticle)
-    },
-    /* 
-    获取专栏简要信息
-    */
-    getColumnAll() {
-        return axios.get(base.baseUrl + base.getColumnAll)
+    getAllArticle(userId: string) {
+        return axios.get(base.baseUrl + base.getAllArticle + userId)
     },
     /* 
     上传图片
@@ -63,12 +56,79 @@ const api = {
     */
     topArticle(topData: object) {
         return axios.post(base.baseUrl + base.topArticle)
-    }
-
+    },
     /* 
     搜索文章
     */
-
+    searchArticle(searchData: object) {
+        return axios.post(base.baseUrl + base.searchArticle, searchData)
+    },
+    /* 
+    获取专栏简要信息
+    */
+    getColumnAll(userId: string) {
+        return axios.get(base.baseUrl + base.getColumnAll + userId)
+    },
+    /* 
+    删除专栏
+    */
+    delColumn(userId: any, columnId: any) {
+        return axios.delete(base.baseUrl + base.delColumn + userId + columnId)
+    },
+    /* 
+    编辑专栏
+    */
+    editorColumn(form: object) {
+        return axios.post(base.baseUrl + base.editorColumn, form)
+    },
+    /*
+    置顶专栏(交换专栏)
+    */
+    topColumn(form: object) {
+        return axios.post(base.baseUrl + base.topColumn, form)
+    },
+    /* 
+    添加专栏
+    */
+    addColumn(form: object) {
+        return axios.post(base.baseUrl + base.addColumn)
+    },
+    /* 
+    获取用户信息
+    */
+    getUserMessage(form: object) {
+        return axios.post(base.baseUrl + base.getUserMessage, form)
+    },
+    /* 
+    删除用户信息
+    */
+    delUser(userId: string) {
+        return axios.delete(base.baseUrl + base.delUser + userId)
+    },
+    /* 
+    编辑用户信息
+    */
+    editorUser(form: object) {
+        return axios.post(base.baseUrl + base.editorUser, form)
+    },
+    /* 
+    获取个人信息
+    */
+    getMyMessage() {
+        return axios.get(base.baseUrl + base.getMyMessage)
+    },
+    /*
+    编辑个人信息
+    */
+    editorMyMessage(form: object) {
+        return axios.post(base.baseUrl + base.editorUser, form)
+    },
+    /* 
+    退出登录
+    */
+    logOut(form: object) {
+        return axios.post(base.baseUrl + base.logout, form)
+    }
 }
 
 export default api

@@ -181,6 +181,7 @@ import { ArticleForm } from "../../../utils/type";
 import api from "../../../api/index";
 import useDescWords from "../../../Hook/useDescWords";
 import type { UploadFile } from "element-plus/es/components/upload/src/upload.type";
+import { useStore } from "vuex";
 export default {
   name: "publishArticle",
   components: {
@@ -241,9 +242,10 @@ export default {
     });
 
     // 获取专栏列表 ok
+    const store = useStore();
     const initPublishArticle = () => {
       api
-        .getColumnAll()
+        .getColumnAll(store.state.userId)
         .then((res) => {
           let { columnList } = res.data.data;
           data.columnList = columnList;

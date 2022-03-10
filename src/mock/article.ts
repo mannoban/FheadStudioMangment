@@ -1,4 +1,5 @@
 import * as Mock from 'mockjs'
+import store from '../store/index'
 
 // 发布文章
 /* 
@@ -28,7 +29,7 @@ Mock.mock('http://127.0.0.1:8080/api/v1/article/publish/121212', 'post', {
 /api/v1/article/get/all     					
 get  
 */
-Mock.mock("http://127.0.0.1:8080/api/v1/article/get/all", "get", {
+Mock.mock(`http://127.0.0.1:8080/api/v1/article/get/all/${store.state.userId}`, "get", {
     columnName: ["vue", "mongoDB", "JS", "CSS"],   //专栏信息
     articleList: [
         {
@@ -48,7 +49,7 @@ Mock.mock("http://127.0.0.1:8080/api/v1/article/get/all", "get", {
             alreadyPublish: 0,
             viewNum: 200,
             publishTime: Date.now(),
-            top: false,
+            top: true,
             coverImgId: " @image('100x100', '#50B347', '#FFF', 'Mock.js')",
             nickname: "静静",
             abstract: "js闭包详解"
@@ -59,7 +60,7 @@ Mock.mock("http://127.0.0.1:8080/api/v1/article/get/all", "get", {
             alreadyPublish: 1,
             viewNum: 150,
             publishTime: Date.now(),
-            top: true,
+            top: false,
             coverImgId: " @image('100x100', '#50B347', '#FFF', 'Mock.js')",
             nickname: "莹莹",
             abstract: "js作用域链"
@@ -67,7 +68,6 @@ Mock.mock("http://127.0.0.1:8080/api/v1/article/get/all", "get", {
     ]
 }
 )
-
 /* 
 获取文章详细信息
 /api/v1/ article/get/{article _id}    				
@@ -128,4 +128,26 @@ Mock.mock("http://127.0.0.1:8080/api/v1/article/delete/001", "post", {
 Mock.mock("http://127.0.0.1:8080/api/v1/article/top", "post", {
     code: 200,
     status: "ok"
+})
+
+/* 
+搜索文章
+*/
+Mock.mock("http://127.0.0.1:8080/api/v1/article/search", "post", {
+    status: "ok",
+    data: {
+        articleList: [
+            {
+                articleId: "001",
+                title: "vuex的使用",
+                alreadyPublish: 1,
+                viewNum: 500,
+                publishTime: Date.now(),
+                top: false,
+                coverImgId: " @image('100x100', '#50B347', '#FFF', 'Mock.js')",
+                nickname: "吴小葵",
+                abstract: "这是一篇Vuex的使用教程"
+            }
+        ]
+    }
 })

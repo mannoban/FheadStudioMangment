@@ -8,5 +8,8 @@ export default {
     },
     GET_USER(state: any, value: String) {
         state.userId = value
+    },
+    GET_USER_ROLE(state: any, value: string) {
+        state.userRole = value;
     }
 }

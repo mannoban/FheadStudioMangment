@@ -24,7 +24,7 @@
         </el-option>
       </el-select>
       <!-- 分类专栏 -->
-      <el-select v-model="columnList" class="m-3" placeholder="分类专栏">
+      <el-select v-model="columnName" class="m-3" placeholder="分类专栏">
         <el-option
           class="column_option"
           v-for="item in columnOptions"
@@ -37,15 +37,17 @@
       <!-- 搜索框 -->
       <el-input
         style="width: 250px"
-        v-model="input1"
+        v-model="searchInput"
         class="w-50 m-2"
         size="middle"
-        placeholder="请输入关键词"
+        placeholder="请输入标题关键词"
       ></el-input>
-      <button class="search_srticle_button">搜索</button>
+      <button class="search_srticle_button" @click="searchArticle()">
+        搜索
+      </button>
     </header>
     <!-- 文章列表 -->
-    <ul class="article_mangment_list">
+    <ul class="article_mangment_list" v-loading="isLoading">
       <li v-for="(item, index) in articleList" :key="item.articleid">
         <div class="list_item_cover left_view">
           <img :src="item.coverImgId" alt="" />
@@ -69,18 +71,18 @@
             ><span class="article_list_footer_date">{{ item.viewNum }}</span>
             <div class="article_mangment_footer_right">
               <span
-                class="article_mangment_footer_edit"
+                class="article_mangment_footer_edit article_link"
                 v-if="item.alreadyPublish == 1"
                 @click="lookArticleDate()"
                 >查看数据</span
               >
               <span
-                class="article_mangment_footer_edit"
+                class="article_mangment_footer_edit article_link"
                 @click="editThisArticle(item, index)"
                 >编辑</span
               >
               <span
-                class="article_mangment_footer_edit"
+                class="article_mangment_footer_edit article_link"
                 @click="lookThisArticle()"
                 >浏览</span
               >
@@ -134,20 +136,29 @@
 import { onMounted, reactive, toRefs, provide, inject } from "vue";
 import { formatTime } from "../../../utils/use";
 import { useRouter } from "vue-router";
-import { MgmtArticleData, ColumnArrObj, TopData } from "../../../utils/type";
+import {
+  MgmtArticleData,
+  ColumnArrObj,
+  TopData,
+  SearchData,
+} from "../../../utils/type";
 import api from "../../../api/index";
 import { ElMessageBox, ElMessage } from "element-plus";
 import useTop from "../../../Hook/useTop";
+import { useStore } from "vuex";
 export default {
   name: "MgmtArticle",
   components: {},
   setup() {
     const date = new Date();
     let thisyear: number = date.getFullYear();
+    const store = useStore();
     let data: MgmtArticleData = reactive({
       yearValue: "", //select绑定值
       monthValue: "",
-      columnList: "",
+      searchInput: "", // input绑定值
+      columnName: "",
+      isLoading: false,
       // options选项
       yearOptions: [
         {
@@ -238,10 +249,10 @@ export default {
 
     // 文章获取
     const init = () => {
-      api.getAllArticle().then((res) => {
+      api.getAllArticle(store.state.userId).then((res) => {
         let { articleList, columnName } = res.data;
         // 专栏初始化
-        let columnArr: MgmtArticleData["columnOptions"] = [];
+        let columnArr: any = [];
         columnName.forEach((element: string, index: number) => {
           let obj: ColumnArrObj = {
             id: 0,
@@ -261,7 +272,6 @@ export default {
     // 编辑文章(movonEditor回显) ok
     const router = useRouter();
     const editThisArticle = (item: any, index: number) => {
-      console.log(item);
       router.push({
         path: "/my/publishArticle",
         query: {
@@ -296,16 +306,13 @@ export default {
           newArticleId: articleId,
         };
         useTopArticleApi(topData);
-        console.log(topData);
       } else {
         let topData: TopData = {
           oldArticleId,
           newArticleId: articleId,
         };
         useTopArticleApi(topData);
-        console.log(topData);
       }
-
       /*  let oldArticle = data.articleList[0];
       let oldArticleTopNumber: number = oldArticle.top;
       let top: number = oldArticleTopNumber + 1;
@@ -332,10 +339,29 @@ export default {
       });
     };
 
-    // 查看数据;
+    // 搜索文章
+    const searchArticle = () => {
+      data.isLoading = true;
+      const userId = store.state.userId;
+      const { yearValue, monthValue, columnName, searchInput } = data;
+      let searchData: SearchData = {
+        userId,
+        year: yearValue,
+        month: monthValue,
+        columnName: columnName,
+        titleAbstruct: searchInput,
+      };
+      api.searchArticle(searchData).then((res) => {
+        data.isLoading = false;
+        let { articleList } = res.data.data;
+        data.articleList = articleList;
+      });
+    };
+
+    // 查看数据(图表可视化)
     const lookArticleDate = () => {};
 
-    // 浏览;
+    // 浏览(调到前台)
     const lookThisArticle = () => {};
 
     return {
@@ -346,140 +372,10 @@ export default {
       lookThisArticle,
       setTopArticle,
       deleteThisArticle,
+      searchArticle,
     };
   },
 };
 </script>
 
-<style >
-/* element */
-
-.mangment_article {
-  width: 1400px;
-  margin-top: 70px;
-  margin-left: 210px;
-}
-.m-2 {
-  width: 100px;
-  margin-left: 15px;
-}
-.m-3 {
-  width: 250px;
-  margin-left: 15px;
-}
-.year_option {
-  width: 100px !important;
-}
-.column_option {
-  width: 250px !important;
-}
-
-.el-input__inner::-webkit-input-placeholder {
-  color: #606266;
-}
-.search_srticle_button {
-  width: 80px;
-  height: 30px;
-  border: 1px solid #fc5531;
-  color: #fc5531;
-  margin-left: 20px;
-  border-radius: 5px;
-}
-.article_mangment_list {
-  margin-top: 20px;
-}
-.list_item_cover {
-  width: 100px;
-  height: 100px;
-  text-align: center;
-}
-.list_item_cover > img {
-  width: 100px;
-  height: 100px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-.article_mangment_list > li {
-  width: 98%;
-  border-top: 0.1px dashed rgb(228, 227, 227);
-  display: flex;
-  padding: 10px 0 10px 0;
-  height: 120px;
-}
-.article_mangment_list:last-child {
-  border-bottom: 0.1px dashed rgb(228, 227, 227);
-}
-.left_view {
-  min-width: 120px;
-  width: 120px;
-  height: 120px;
-  position: relative;
-}
-.right_view {
-  flex-grow: 1;
-  margin-left: 15px;
-  display: flex;
-  flex-direction: column;
-}
-.right_view > div {
-  height: 40px;
-
-  line-height: 40px;
-}
-.list_item_header,
-.list_item_container,
-.list_item_footer {
-  display: block;
-}
-
-.circle {
-  display: inline-block;
-  width: 4px;
-  height: 4px;
-  background: #555666;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  border-radius: 4px;
-  margin: 0 10px 3.5px 10px;
-}
-.article_list_footer_date {
-  color: #555666;
-}
-.article_mangment_title {
-  font-size: 16px;
-  color: #555666;
-}
-.article_mangment_title:hover {
-  color: #fc5531;
-}
-.original,
-.draft {
-  width: 32px;
-  background-color: #fff5f2;
-  color: #fc5531;
-  font-size: 13px;
-}
-.draft {
-  color: #999aaa;
-}
-.article_mangment_footer_right {
-  float: right;
-  cursor: pointer;
-}
-.article_mangment_footer_edit {
-  margin-right: 30px;
-  font-size: 14px;
-}
-.reset_btn {
-  width: 70px;
-  height: 30px;
-  border-radius: 15px;
-  margin-top: 10px;
-}
-.reset_btn:hover {
-  background-color: #fc5531;
-  color: #fff;
-}
-</style>
+<style src="./index.css"/>

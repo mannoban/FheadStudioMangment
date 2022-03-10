@@ -33,15 +33,6 @@ export const getRequest = (urlStr?: string): object => {
     }
     return theRequest;
 }
-
-/* 
- 函数防抖
-*/
-
-/* 
-函数节流
-*/
-
 /* 
 提取文章摘要前155个字
 */
@@ -63,3 +54,12 @@ export const mdToText = (str: string) => {
         .replace(/\s/g, "")                           //全局匹配空字符;
     return str.slice(0, 155);
 }
+
+/* 
+ 函数防抖
+*/
+
+/* 
+函数节流
+*/
+

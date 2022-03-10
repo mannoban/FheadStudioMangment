@@ -1,0 +1,156 @@
+/* element */
+
+.mangment_article {
+    width: 1400px;
+    margin-top: 70px;
+    margin-left: 210px;
+}
+
+.m-2 {
+    width: 100px;
+    margin-left: 15px;
+}
+
+.m-3 {
+    width: 250px;
+    margin-left: 15px;
+}
+
+.year_option {
+    width: 100px !important;
+}
+
+.column_option {
+    width: 250px !important;
+}
+
+.el-input__inner::-webkit-input-placeholder {
+    color: #606266;
+}
+
+.search_srticle_button {
+    width: 80px;
+    height: 30px;
+    border: 1px solid #fc5531;
+    color: #fc5531;
+    margin-left: 20px;
+    border-radius: 5px;
+}
+
+.article_mangment_list {
+    margin-top: 20px;
+}
+
+.list_item_cover {
+    width: 100px;
+    height: 100px;
+    text-align: center;
+}
+
+.list_item_cover>img {
+    width: 90px;
+    height: 90px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.article_mangment_list>li {
+    width: 98%;
+    border-top: 0.1px dashed rgb(228, 227, 227);
+    display: flex;
+    padding: 10px 0 10px 0;
+    height: 120px;
+}
+
+.article_mangment_list:last-child {
+    border-bottom: 0.1px dashed rgb(228, 227, 227);
+}
+
+.left_view {
+    min-width: 120px;
+    width: 120px;
+    height: 120px;
+    position: relative;
+}
+
+.right_view {
+    flex-grow: 1;
+    margin-left: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.right_view>div {
+    height: 40px;
+    line-height: 40px;
+}
+
+.list_item_header,
+.list_item_container,
+.list_item_footer {
+    display: block;
+}
+
+.circle {
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: #555666;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    margin: 0 10px 3.5px 10px;
+}
+
+.article_list_footer_date {
+    color: #555666;
+}
+
+.article_mangment_title {
+    font-size: 16px;
+    color: #555666;
+}
+
+.article_mangment_title:hover {
+    color: #fc5531;
+}
+
+.article_link:hover {
+    color: #1f93db;
+}
+
+.original,
+.draft {
+    width: 32px;
+    background-color: #fff5f2;
+    color: #fc5531;
+    font-size: 13px;
+}
+
+.draft {
+    color: #999aaa;
+}
+
+.article_mangment_footer_right {
+    float: right;
+    cursor: pointer;
+}
+
+.article_mangment_footer_edit {
+    margin-right: 30px;
+    font-size: 14px;
+}
+
+.reset_btn {
+    width: 70px;
+    height: 30px;
+    border-radius: 15px;
+    margin-top: 10px;
+}
+
+.reset_btn:hover {
+    background-color: #fc5531;
+    color: #fff;
+}

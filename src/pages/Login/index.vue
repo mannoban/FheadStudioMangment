@@ -185,9 +185,10 @@ export default defineComponent({
       api
         .userLogin(userForm)
         .then((res) => {
-          let { token, userId } = res.data.data;
+          let { token, userId, role } = res.data.data;
           store.dispatch("setToken", token);
           store.dispatch("getUser", userId);
+          store.dispatch("getUserRole", role);
           router.push("/my");
           ElMessage({
             message: "登录成功",

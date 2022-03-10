@@ -1,22 +1,14 @@
-import { log } from 'console';
-import { MgmtArticleData } from '../utils/type'
-
 // 返回置顶后的数组
-export default function (arr: MgmtArticleData["articleList"]) {
-    let newArr: MgmtArticleData["articleList"] = [];
-    let oldArr: MgmtArticleData["articleList"] = [];
+export default function (arr: any) {
+    let newArr: any = [];
+    let oldArr: any = [];
     for (let i = 0; i < arr.length; i++) {
-        arr[i].top === true ? newArr[0] = arr[i] : newArr = [];
+        arr[i].top === true ? newArr.push(arr[i]) : oldArr.push(arr[i])
     }
     if (newArr.length === 0) {
-        return arr;
+        newArr = arr;
     } else {
-        for (let i = 0; i < arr.length; i++) {
-            if (arr[i].top === false) {
-                oldArr.push(arr[i])
-            }
-        }
         newArr = newArr.concat(oldArr);
-        return newArr;
     }
+    return newArr;
 }

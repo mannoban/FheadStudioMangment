@@ -29,9 +29,9 @@
               <el-menu-item index="1-3" @click="mgmtColumnList()"
                 >专栏管理</el-menu-item
               >
-              <el-menu-item index="1-4" @click="mgmtComment()"
+              <!-- <el-menu-item index="1-4" @click="mgmtComment()"
                 >评论管理</el-menu-item
-              >
+              > -->
             </el-menu-item-group>
           </el-sub-menu>
           <el-sub-menu index="2">
@@ -42,9 +42,6 @@
               <el-menu-item index="2-1" @click="articleData()"
                 >作品数据</el-menu-item
               >
-              <el-menu-item index="2-2" @click="fansData()"
-                >粉丝数据</el-menu-item
-              >
             </el-menu-item-group>
           </el-sub-menu>
           <el-sub-menu index="3">
@@ -52,8 +49,11 @@
               <el-icon><avatar /></el-icon>信息
             </template>
             <el-menu-item-group>
-              <el-menu-item index="3-1" @click="visitorMessage()"
-                >游客信息</el-menu-item
+              <el-menu-item
+                index="3-1"
+                @click="visitorMessage()"
+                v-if="$store.state.userRole === 'manager'"
+                >成员信息</el-menu-item
               >
               <el-menu-item index="3-2" @click="myMessage()"
                 >个人管理</el-menu-item
@@ -69,8 +69,9 @@
 </template>
   
 <script lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, reactive, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import { useStore } from "vuex";
 import {
   Edit,
   Message,
@@ -92,6 +93,12 @@ export default {
 
   setup() {
     const router = useRouter();
+    const store = useStore();
+    let userRole = ref();
+
+    onMounted(() => {
+      // userRole.value = store.userRole;
+    });
 
     const backArticle = () => {
       router.push("/article");

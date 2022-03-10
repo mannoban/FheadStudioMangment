@@ -3,6 +3,7 @@
     <div class="person_messsage">
       <div class="personal">
         <h3 style="display: inline-block">个人信息</h3>
+        <img :src="userData.headImgId" alt="" class="personal_head_img" />
         <button class="back_login_btn" @click="backLogin()">退出登录</button>
       </div>
       <ul class="message_list">
@@ -44,7 +45,7 @@
         <!-- id -->
         <li>
           <span class="message_key">用 户 I D</span>
-          <span class="message_value">{{ userData.id }}</span>
+          <span class="message_value">{{ userData.userId }}</span>
         </li>
         <!-- 性别 -->
         <li>
@@ -218,7 +219,7 @@ import { reactive, toRefs, onMounted } from "vue";
 import { provinceAndCityData } from "element-china-area-data";
 import { useStore } from "vuex";
 import { ElMessageBox } from "element-plus";
-import axios from "../../../utils/request.ts";
+import api from "../../../api/index";
 export default {
   name: "MyMessage",
   components: {
@@ -241,13 +242,14 @@ export default {
       // 个人信息
       userData: [
         {
-          id: "",
+          userId: "",
           nameValue: "",
           sexValue: "",
           personalProfile: "",
           place: "",
           birthDate: "",
           selectedOptions: [],
+          headImgId: "",
         },
       ],
       // 教育信息
@@ -272,23 +274,26 @@ export default {
     };
 
     const init = () => {
-      axios
-        .get("http://127.0.0.1:8080/api/user/mine")
-        .then((res) => {
-          console.log(res);
-          let { name, id, sex, personalProfile, place, birthday } = res.data;
-          state.userData.nameValue = name;
-          state.userData.sexValue = sexString(sex);
-          state.userData.id = id;
-          state.userData.personalProfile = personalProfile;
-          state.userData.place = place;
-          state.userData.birthDate = birthday;
-          console.log(state.userData);
-        })
-
-        .catch((err) => {
-          console.log(err);
-        });
+      api.getMyMessage().then((res) => {
+        console.log(res);
+        let { personalMessage } = res.data.data;
+        let {
+          userId,
+          nickname,
+          headImgId,
+          sex,
+          personalBrief,
+          place,
+          birthDate,
+        } = personalMessage;
+        state.userData.nameValue = nickname;
+        state.userData.sexValue = sexString(sex);
+        state.userData.userId = userId;
+        state.userData.personalProfile = personalBrief;
+        state.userData.place = place;
+        state.userData.birthDate = birthDate;
+        state.userData.headImgId = headImgId;
+      });
     };
 
     // 编辑姓名
@@ -299,7 +304,7 @@ export default {
     const submitNameValue = () => {
       console.log(state.userData);
     };
-    const cancleNameValue = () => {};
+
     // 编辑性别
     const showSexInput = () => {
       state.sexInput = true;
@@ -328,9 +333,9 @@ export default {
     const store = useStore();
     const backLogin = () => {
       ElMessageBox.confirm("确认退出登录吗?", "Warning", {
+        type: "warning",
         cancelButtonText: "取消",
         confirmButtonText: "确认",
-        type: "warning",
       }).then(() => {
         store.dispatch("outLogin");
         window.location.reload();
@@ -341,7 +346,6 @@ export default {
       ...toRefs(state),
       showNameInput,
       submitNameValue,
-      cancleNameValue,
       showSexInput,
       showProfileInput,
       showPlaceInput,
@@ -372,8 +376,9 @@ export default {
   margin-bottom: 20px;
 }
 .personal {
-  height: 50px;
-  line-height: 50px;
+  position: relative;
+  height: 80px;
+  line-height: 80px;
   padding-left: 40px;
   border-bottom: 1px solid #ccc;
 }
@@ -475,5 +480,15 @@ export default {
 
 input[readonly] {
   background-color: #fff !important;
+}
+
+.personal_head_img {
+  width: 60px;
+  height: 60px;
+  border-radius: 60px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 200px;
 }
 </style>

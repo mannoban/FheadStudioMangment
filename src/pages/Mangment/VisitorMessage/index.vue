@@ -8,11 +8,11 @@
       </i>
     </div>
     <el-table :data="visitorData" style="width: 99%" border="true">
-      <el-table-column prop="date" label="注册日期" />
+      <el-table-column prop="registerDate" label="注册日期" />
       <el-table-column prop="email" label="邮箱" />
-      <el-table-column prop="userName" label="用户名" />
-      <el-table-column prop="phone" label="联系方式" />
-      <el-table-column prop="identify" label="身份" />
+      <el-table-column prop="nickname" label="用户名" />
+      <el-table-column prop="telephone" label="联系方式" />
+      <el-table-column prop="role" label="身份" />
       <el-table-column label="操作">
         <template #default="scope">
           <el-button
@@ -30,13 +30,14 @@
         </template>
       </el-table-column>
     </el-table>
-
     <!-- 分页 -->
     <el-pagination
       background
       layout="prev, pager, next"
       :total="total"
       :page-size="pageSize"
+      :current-page="currentPage"
+      @current-change="getCurrentPage"
       class="pagination block"
     >
     </el-pagination>
@@ -65,14 +66,14 @@
           readonly="readonly"
         ></el-input>
       </el-form-item>
-      <el-form-item label="用户名" prop="username">
-        <el-input v-model="ruleForm.username" style="width: 350px"></el-input>
+      <el-form-item label="用户名" prop="nickname">
+        <el-input v-model="ruleForm.nickname" style="width: 350px"></el-input>
       </el-form-item>
-      <el-form-item label="联系方式" prop="phone">
-        <el-input v-model="ruleForm.phone" style="width: 350px"></el-input>
+      <el-form-item label="联系方式" prop="telephone">
+        <el-input v-model="ruleForm.telephone" style="width: 350px"></el-input>
       </el-form-item>
-      <el-form-item label="身份" prop="identify">
-        <el-radio-group v-model="ruleForm.identify">
+      <el-form-item label="身份" prop="role">
+        <el-radio-group v-model="ruleForm.role">
           <el-radio label="manager"></el-radio>
           <el-radio label="employee"></el-radio>
         </el-radio-group>
@@ -102,41 +103,43 @@ import axios from "../../../utils/request";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { Search } from "@element-plus/icons-vue";
 import { formatTime } from "../../../utils/use";
+import api from "../../../api/index";
 export default {
   name: "VisitorMessage",
   setup(props) {
     let data = reactive({
       dialogFormVisible: false,
       formLabelWidth: "120px",
-      visitorData: [{}], //用户信息
       formSize: "120px",
-      pageSize: 10,
-      total: 100,
+      pageSize: 10, //每页显示多少条
+      total: 100, // 总用户条数
+      currentPage: 1, //当前页数
+      visitorData: [{}], //用户信息
       // 编辑信息
       ruleForm: {
-        id: "",
+        userId: "",
         registerDate: "",
         email: "",
-        username: "",
-        identify: "",
-        phone: "",
+        telephone: "",
+        nickname: "",
+        role: "",
       },
       // 编辑栏规则
       rules: {
-        username: [
+        registerDate: [{ required: true }],
+        nickname: [
           {
             required: true,
-            message: "Please input username",
+            message: "请输入用户名",
             trigger: "blur",
           },
         ],
-        registerDate: [{ required: true }],
         email: [{ required: true }],
-        phone: [{ required: true }],
-        identify: [
+        telephone: [{ required: true }],
+        role: [
           {
             required: true,
-            message: "Please input identify",
+            message: "请选择用户身份",
             trigger: "blur",
           },
         ],
@@ -145,84 +148,77 @@ export default {
 
     // 初始化
     onMounted(() => {
-      getUserList();
+      getCurrentPage(data.currentPage);
     });
 
-    //获取游客信息(分页请求)
-    const getUserList = () => {
-      axios
-        .get("api/visitors/all")
-        .then((res) => {
-          let newArr = [];
-          for (let item of res.data) {
-            item.date = formatTime(item.date);
-            newArr.push(item);
-          }
-          data.visitorData = newArr;
-          data.total = res.data.length;
-        })
-        .catch((err) => {
-          throw err;
-        });
+    //获取游客信息(分页请求) ok
+    const getCurrentPage = (currentPage: number) => {
+      let form = {
+        pages: currentPage,
+        onePageSum: 10,
+      };
+      api.getUserMessage(form).then((res) => {
+        let newArr = [];
+        let { totalUserNumber, userArr } = res.data.data;
+        data.total = totalUserNumber;
+        for (let item of userArr) {
+          item.registerDate = formatTime(item.registerDate);
+          newArr.push(item);
+        }
+        data.total = totalUserNumber;
+        data.visitorData = newArr;
+      });
     };
 
-    // 删除游客信息
+    // 删除游客信息 ok
     const handleDelete = (index: number, row: any) => {
-      let email = row.email;
-      let formData = {
-        email,
-      };
+      let userId = row.userId;
+      console.log(userId);
       ElMessageBox.confirm("确认删除该用户吗?", "Warning", {
         cancelButtonText: "取消",
         confirmButtonText: "确认",
         type: "warning",
-      }).then(() => {
-        axios
-          .post("api/visitors/delete", formData)
-          .then((res) => {
-            ElMessage({
-              showClose: true,
-              message: "删除成功",
-              type: "success",
-            });
-            window.location.reload();
-          })
-          .catch((err) => {
-            ElMessage({
-              showClose: true,
-              message: "删除失败",
-              type: "error",
-            });
+      }).then(async () => {
+        await api.delUser(userId).then((res) => {
+          ElMessage({
+            message: "删除成功",
+            type: "success",
           });
+        });
+        await window.location.reload();
       });
     };
 
-    // 编辑游客信息
+    // 编辑游客信息 ok
     const handleEdit = (e: any, row: any, index: number) => {
-      data.dialogFormVisible = true;
-      data.ruleForm.email = `${row.email}`;
-      data.ruleForm.registerDate = `${row.date}`;
-      data.ruleForm.username = row.userName;
-      data.ruleForm.identify = row.identify;
-      data.ruleForm.phone = row.phone;
-      data.ruleForm.id = row._id;
+      let { email, registerDate, nickname, role, telephone, userId } = row;
+      data.dialogFormVisible = true; //打开模态框
+      data.ruleForm.email = email;
+      data.ruleForm.registerDate = registerDate;
+      data.ruleForm.nickname = nickname;
+      data.ruleForm.role = role;
+      data.ruleForm.telephone = telephone;
+      data.ruleForm.userId = userId;
     };
 
-    // 提交修改信息
+    // 提交修改信息 ok
     const submitEditUserForm = () => {
-      const editUserForm = data.ruleForm;
-      console.log(editUserForm);
-      axios
-        .post("url", editUserForm)
-        .then((res) => {
-          console.log(res);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      let { email, registerDate, nickname, role, telephone, userId } =
+        data.ruleForm;
+      let form = {
+        email,
+        registerDate,
+        nickname,
+        role,
+        telephone,
+        userId,
+      };
+      api.editorUser(form).then((res) => {
+        data.dialogFormVisible = false;
+      });
     };
 
-    // 查询游客信息
+    // 查询游客信息 ok
     const searchVisitor = () => {};
 
     return {
@@ -233,6 +229,7 @@ export default {
       formatTime,
       searchVisitor,
       submitEditUserForm,
+      getCurrentPage,
     };
   },
 };

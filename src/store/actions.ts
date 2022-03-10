@@ -11,5 +11,8 @@ export default {
     },
     getUser({ commit }: any, value: string) {
         commit('GET_USER', value)
+    },
+    getUserRole({ commit }: any, value: string) {
+        commit("GET_USER_ROLE", value)
     }
 }
